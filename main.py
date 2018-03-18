@@ -16,6 +16,6 @@ if __name__ == '__main__':
     copy_file_to_local_dir(imageFilePath)
     convert_imgs_to_arrays('data/images', 'data/images_npz')
     run_algo('data/images_npz')
-    status = execute_js('file.js')
+    status = execute_js('server.js')
     print(status)
     
