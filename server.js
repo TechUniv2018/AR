@@ -1,6 +1,7 @@
-var HTML = require('html-parse-stringify')
+var HTML = require('html-parse-stringify');
 var html='';
 var fs = require('fs')
+const shell = require('shelljs');
 
 componentCount = {};
 fileLineCounter = {};
@@ -25,7 +26,7 @@ function walkTheDOM(node, func) {
 }
 
 function makeComponent(node){
-
+  console.log('making components');
     if(node.type==='tag'){
     if (node.attrs.class)
     {
@@ -34,15 +35,49 @@ function makeComponent(node){
         if(!componentCount[node.attrs.class])
         {
             componentCount[node.attrs.class] = 1;
-            fs.mkdirSync(node.attrs.class);
-            fs.writeFileSync(`${node.attrs.class}/index.js`,"import React from 'react';\nimport './"+node.attrs.class+".css';\nexport default class "+node.attrs.class+" extends React.Component {\nrender() {\nreturn (\n);\n}}");
-            fs.writeFileSync(`${node.attrs.class}/${node.attrs.class}.css`,'');
+            fs.mkdirSync(`../${process.argv[2]}/src/Components/${node.attrs.class}`);
+            fs.writeFileSync(`../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`,"import React from 'react';\nimport './"+node.attrs.class+".css';\nexport default class "+node.attrs.class+" extends React.Component {\nrender() {\nreturn (\n);\n}}");
+            fs.writeFileSync(`../${process.argv[2]}/src/Components/${node.attrs.class}/${node.attrs.class}.css`,'');
         }
         else{
           componentCount[node.attrs.class]++;
         }
     }
 }
+fs.writeFileSync(`../${process.argv[2]}/src/App.js`, `import React, { Component } from 'react';
+import CONTAINER from './Components/CONTAINER';
+
+class App extends Component {
+  render() {
+    return (
+      <div className="App">
+        <CONTAINER />
+      </div>
+    );
+  }
+}
+
+export default App;`);
+fs.writeFileSync(`../${process.argv[2]}/public/index.html`, `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <title>React App</title>
+  </head>
+  <body>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <div id="root"></div>
+  </body>
+</html>
+`);
 }
 
 
@@ -69,7 +104,7 @@ function secondIteration(node, func, parentFile, searchString, currentFile) {
         if(insert.type === 1)
         {
           // console.log(element.attrs.class);
-          marker2 = secondIteration(element, func,currentFile, marker2, `./${node.attrs.class}/index.js`);
+          marker2 = secondIteration(element, func,currentFile, marker2, `../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`);
           // marker = insert.search;
         }
         else{
@@ -117,16 +152,16 @@ function insertCode(node,currentFile, searchString,parentFile) {
         }
 
         try{
-          temp = fs.readFileSync(`./${node.attrs.class}/index.js`);
+          temp = fs.readFileSync(`../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`);
         }catch(e) {
           console.log('readfile error',e);
         }
-        pos = nthIndex(temp.toString(),'\n',fileLineCounter[`./${node.attrs.class}/index.js`]);
+        pos = nthIndex(temp.toString(),'\n',fileLineCounter[`../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`]);
         pos=pos+1;
         temp = temp.toString().substr(0,pos)+`<${node.name} className="${node.attrs.classBackup}">\n</${node.name}>\n`+temp.toString().substr(pos);
-        fileLineCounter[`./${node.attrs.class}/index.js`]+=1;
+        fileLineCounter[`../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`]+=1;
         try{
-          fs.writeFileSync(`./${node.attrs.class}/index.js`, temp)
+          fs.writeFileSync(`../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`, temp)
         }catch(e) {
           console.log('writefile error',e);
         }
@@ -164,14 +199,14 @@ function insertCode(node,currentFile, searchString,parentFile) {
         fs.writeFileSync(currentFile, temp)
 
 
-        if(fileLineCounter[`./${node.attrs.class}/index.js`] === 5)
+        if(fileLineCounter[`../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`] === 5)
         {
-          temp = fs.readFileSync(`./${node.attrs.class}/index.js`);
-          pos = nthIndex(temp,'\n',fileLineCounter[`./${node.attrs.class}/index.js`]);
+          temp = fs.readFileSync(`../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`);
+          pos = nthIndex(temp,'\n',fileLineCounter[`../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`]);
           pos=pos+1;
           temp = temp.toString().substr(0,pos)+`<${node.name} className="${node.attrs.classBackup}">\n {this.props.children}\n</${node.name}>\n`+temp.toString().substr(pos);
-          fs.writeFileSync(`./${node.attrs.class}/index.js`, temp)
-          fileLineCounter[`./${node.attrs.class}/index.js`]+=1;
+          fs.writeFileSync(`../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`, temp)
+          fileLineCounter[`../${process.argv[2]}/src/Components/${node.attrs.class}/index.js`]+=1;
         }
 
 
@@ -237,50 +272,63 @@ function insertCode(node,currentFile, searchString,parentFile) {
 
 
 
+function createReactApp (appName) {
+  shell.cd('~/Documents/');
+  // await shell.exec(`create-react-app ${appName}`);
+  if (shell.exec(`create-react-app ${appName}`).code === 0) {
+    shell.cd(`~/Documents/html2React`);
+    fs.mkdirSync(`../${process.argv[2]}/src/Components`);
+    fs.readFile('./index.html',(err,data)=>{
+       console.log('wrewe');
+       str  = data.toString()
+       html=str.replace(/\n/g, "").replace(/[\t ]+\</g, "<").replace(/\>[\t ]+\</g, "><").replace(/\>[\t ]+$/g, ">");
+       htmlCopy = html;
+       let mainCropped = "<main" + html.split("<main")[1];
+       html = mainCropped.split("</main>")[0]+"</main>";
+       let styles = htmlCopy.split("<style>")[1];
+       styles = styles.split("</style>")[0];
+       // html = mainCropped2;
+       var ast = HTML.parse(html);
+       // console.log(ast)
+       
+       walkTheDOM(ast[0],makeComponent);
+       fileLineCounter[`../${process.argv[2]}/App.js`] = 1;
+       Object.keys(componentCount).forEach((key)=>{
+         fileLineCounter[`../${process.argv[2]}/src/Components/${key}/index.js`] = 5;
+       })
+       // console.log('component counter is: ',Object.keys(componentCount));
+       secondIteration(ast[0],insertCode,null,'return (','./App.js')
+       // console.log(temp);
+       Object.keys(componentCount).forEach((key)=>{
+         let file = fs.readFileSync(`../${process.argv[2]}/src/Components/${key}/index.js`);
+         str = file.toString();
+         var regex = /className/gi, result, indices = [];
+         while ( (result = regex.exec(str)) ) {
+           indices.push(result.index);
+         }
+         // console.log(indices);
+         indices.forEach((index)=>{
+           str.slice(index+11).split("\"")[0].split(" ").forEach((className)=>{
+             if(styles.split(className).length>1){
+               console.log(`.${className}`+styles.split(className)[1].split('}')[0]+'}');
+               cssData = fs.readFileSync(`../${process.argv[2]}/src/Components/${key}/${key}.css`);
+               cssData = cssData.toString();
+               cssData = styles.substr(styles.indexOf(className)-1,styles.substring(styles.indexOf(className)).indexOf('}')+2);
+               //cssData = `.${className}`+styles.split(className)[1].split('}')[0]+'}\n'+cssData;
+               fs.writeFileSync(`../${process.argv[2]}/src/Components/${key}/${key}.css`,cssData);
+             }
+             // console.log(className,styles.split(className).length,"\n\n\n");
+           })
+           // console.log(str.slice(index+11).split("\"")[0].split(" "));
+         })
 
+       })
 
- fs.readFile('./index.html',(err,data)=>{
-    str  = data.toString()
-    html=str.replace(/\n/g, "").replace(/[\t ]+\</g, "<").replace(/\>[\t ]+\</g, "><").replace(/\>[\t ]+$/g, ">");
-    htmlCopy = html;
-    let mainCropped = "<main" + html.split("<main")[1];
-    html = mainCropped.split("</main>")[0]+"</main>";
-    let styles = htmlCopy.split("<style>")[1];
-    styles = styles.split("</style>")[0];
-    // html = mainCropped2;
-    var ast = HTML.parse(html);
-    // console.log(ast)
-    walkTheDOM(ast[0],makeComponent)
-    fileLineCounter['./App.js'] = 1;
-    Object.keys(componentCount).forEach((key)=>{
-      fileLineCounter[`./${key}/index.js`] = 5;
+       // console.log(componentCount)
     })
-    // console.log('component counter is: ',Object.keys(componentCount));
-    secondIteration(ast[0],insertCode,null,'return (','./App.js')
-    // console.log(temp);
-    Object.keys(componentCount).forEach((key)=>{
-      let file = fs.readFileSync(`./${key}/index.js`);
-      str = file.toString();
-      var regex = /className/gi, result, indices = [];
-      while ( (result = regex.exec(str)) ) {
-        indices.push(result.index);
-      }
-      // console.log(indices);
-      indices.forEach((index)=>{
-        str.slice(index+11).split("\"")[0].split(" ").forEach((className)=>{
-          if(styles.split(className).length>1){
-            console.log(`.${className}`+styles.split(className)[1].split('}')[0]+'}');
-            cssData = fs.readFileSync(`./${key}/${key}.css`);
-            cssData = cssData.toString();
-            cssData = `.${className}`+styles.split(className)[1].split('}')[0]+'}\n'+cssData;
-            fs.writeFileSync(`./${key}/${key}.css`,cssData);
-          }
-          // console.log(className,styles.split(className).length,"\n\n\n");
-        })
-        // console.log(str.slice(index+11).split("\"")[0].split(" "));
-      })
+  }
+  
+};
 
-    })
 
-    // console.log(componentCount)
- })
+createReactApp(process.argv[2]);
