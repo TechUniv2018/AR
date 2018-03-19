@@ -1,0 +1,25 @@
+{
+  "name": "ar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "file.js",
+  "dependencies": {
+    "html-parse-stringify": "^1.0.2",
+    "shelljs": "^0.8.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TechUniv2018/AR.git"
+  },
+  "author": "Aakash Raj U, Sreekar Beyotch, Aakash Verma, Sahil B, Abhilash The Stud",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TechUniv2018/AR/issues"
+  },
+  "homepage": "https://github.com/TechUniv2018/AR#readme"
+}
