@@ -276,7 +276,7 @@ function createReactApp (appName) {
   shell.cd('~/Documents/');
   // await shell.exec(`create-react-app ${appName}`);
   if (shell.exec(`create-react-app ${appName}`).code === 0) {
-    shell.cd(`~/Documents/html2React`);
+    shell.cd(`~/Documents/AR`);
     fs.mkdirSync(`../${process.argv[2]}/src/Components`);
     fs.readFile('./index.html',(err,data)=>{
        console.log('wrewe');
@@ -314,6 +314,9 @@ function createReactApp (appName) {
                cssData = fs.readFileSync(`../${process.argv[2]}/src/Components/${key}/${key}.css`);
                cssData = cssData.toString();
                cssData = styles.substr(styles.indexOf(className)-1,styles.substring(styles.indexOf(className)).indexOf('}')+2);
+               if(cssData[0]!=='.'){
+                 cssData = cssData.substring(1);
+               }
                //cssData = `.${className}`+styles.split(className)[1].split('}')[0]+'}\n'+cssData;
                fs.writeFileSync(`../${process.argv[2]}/src/Components/${key}/${key}.css`,cssData);
              }

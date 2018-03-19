@@ -2,6 +2,7 @@ import sys
 from process_images import convert_imgs_to_arrays
 import shutil
 from Naked.toolshed.shell import execute_js, muterun_js
+# from subprocess import run
 from algo import *
 
 def readImageFile():
@@ -16,6 +17,7 @@ if __name__ == '__main__':
     copy_file_to_local_dir(imageFilePath)
     convert_imgs_to_arrays('data/images', 'data/images_npz')
     run_algo('data/images_npz')
-    status = execute_js('server.js')
+    status = execute_js('server.js', arguments=sys.argv[2])
+    # run("node file.js")
     print(status)
     
